@@ -5,32 +5,45 @@
  * Assignment #4.
  */
 
-import acm.graphics.*;
+
 import acm.program.*;
 import acm.util.*;
 
-import java.awt.*;
+
 
 
 public class Hangman extends ConsoleProgram {
 	private HangmanLexicon lexicon = new HangmanLexicon();
 	private RandomGenerator rgen = new RandomGenerator();
+	private HangmanCanvas canvas;
+	
+	
+	public void init(){
+		canvas = new HangmanCanvas();
+		add(canvas);
+	}
 
     public void run() {
 		println("Welcome to Hangman!");
-		String secretWord = lexicon.getWord(rgen.nextInt(0,lexicon.getWordCount()));
+		String secretWord = lexicon.getWord(rgen.nextInt(0,lexicon.getWordCount()-1));
 		String dashedWord = dashing(secretWord);
+		canvas.displayWord(dashedWord);
+		canvas.reset();
+
 		int guessCount = 8;
 		while(!dashedWord.equals(secretWord) && guessCount != 0){
 			println("The word now looks like this: "+ dashedWord);
 			println("You have " + guessCount + " guesses left.");
-			String guessedChar = readcharachter();
-			guessedChar = guessedChar.toUpperCase();
-			if(guessedCharInSecretTheWord(guessedChar, secretWord)){
-				dashedWord = replaceCharInstances(guessedChar, secretWord, dashedWord);
+			char guessedLetter = readcharachter();
+			guessedLetter = Character.toUpperCase(guessedLetter);
+			if(guessedCharInSecretTheWord(guessedLetter, secretWord)){
+				dashedWord = replaceCharInstances(guessedLetter, secretWord, dashedWord);
+				canvas.displayWord(dashedWord);
 			}else{
-				println("There are no " + guessedChar + "'s in the word.");
+				println("There are no " + guessedLetter + "'s in the word.");
 				guessCount--;
+				
+				canvas.noteIncorrectGuess(guessedLetter);
 			}
 		}
 		if(dashedWord.equals(secretWord)){
@@ -47,19 +60,19 @@ public class Hangman extends ConsoleProgram {
 
 	
 
-	private String replaceCharInstances(String guessedChar, String secretWord, String dashedWord) {
-		int pos = secretWord.indexOf(guessedChar);
+	private String replaceCharInstances(char guessedLetter, String secretWord, String dashedWord) {
+		int pos = secretWord.indexOf(guessedLetter);
 		while(pos != -1){
-			dashedWord = dashedWord.substring(0,pos) + guessedChar + dashedWord.substring(pos+1);
-			pos = secretWord.indexOf(guessedChar, pos + 1);
+			dashedWord = dashedWord.substring(0,pos) + guessedLetter + dashedWord.substring(pos+1);
+			pos = secretWord.indexOf(guessedLetter, pos + 1);
 		}
 		return dashedWord;
 	}
 
 
 
-	private boolean guessedCharInSecretTheWord(String guessedChar , String secretWord) {
-		if(secretWord.indexOf(guessedChar.charAt(0)) != -1)
+	private boolean guessedCharInSecretTheWord(char guessedLetter , String secretWord) {
+		if(secretWord.indexOf(guessedLetter) != -1)
 			return true;
 		else
 			return false;
@@ -67,14 +80,14 @@ public class Hangman extends ConsoleProgram {
 
 
 
-	private String readcharachter() {
+	private char readcharachter() {
 		while(true){
 			String character = readLine("Your guess: ");
 			println();
 			if(character.length() > 1 || character.length() == 0 || !Character.isLetter(character.charAt(0))){
 				println("Please Enter your guess single letter!");
 			}else{
-				return character;
+				return character.charAt(0);
 			}
 		}
 	}
