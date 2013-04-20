@@ -7,7 +7,8 @@
 import acm.graphics.*;
 
 public class HangmanCanvas extends GCanvas {
-	public String errorChars = "";
+	private String errorChars = "";
+	private GLabel dashedWord = new GLabel("");
 
 /** Resets the display so that only the scaffold appears */
 	public void reset() {
@@ -49,11 +50,7 @@ public class HangmanCanvas extends GCanvas {
 		
 		double x = getWidth() / 6;
 		double y = 5 * getHeight() / 6;
-		
-		if(getElementAt(x,y) != null)
-			remove(getElementAt(x,y));
-		
-		GLabel dashedWord = new GLabel(word);
+		dashedWord.setLabel(word);
 		dashedWord.setFont("SansSerif-italic-30");
 		add(dashedWord,x,y);
 	}
@@ -67,11 +64,7 @@ public class HangmanCanvas extends GCanvas {
 	public void noteIncorrectGuess(char guessedLetter) {
 		errorChars += guessedLetter;
 		double x = getWidth() / 6;
-		double y = getHeight()-30 ;
-		
-		if(getElementAt(x,y) != null)
-			remove(getElementAt(x,y));
-		
+		double y = getHeight()-30 ;		
 		GLabel errorletters = new GLabel(errorChars);
 		errorletters.setFont("SansSerif-20");
 		add(errorletters,x,y);
