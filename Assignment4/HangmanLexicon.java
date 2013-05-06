@@ -13,14 +13,9 @@ import acm.util.*;
 public class HangmanLexicon {
 	private ArrayList<String> words = new ArrayList<String>();
 	public HangmanLexicon(){
-		BufferedReader rd ;
-		try {
-			rd = new BufferedReader(new FileReader("HangmanLexicon.txt"));
-		} catch (IOException ex) {
-			throw new ErrorException(ex);
-		}
 		
 		try {
+			BufferedReader rd = new BufferedReader(new FileReader("HangmanLexicon.txt"));
 			while(true){
 				String line = rd.readLine();
 				if(line == null)break;
