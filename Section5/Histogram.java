@@ -20,11 +20,9 @@ public class Histogram extends ConsoleProgram {
 		for(int i =0;i< histogram.length;i++){
 			String label;
 			switch(i){
-				case 0: label = "00 - 09";break;
-				case 1:case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9: 
-					label = i * 10 + " - " + (i * 10 + i); 	break;
-				case 10: label = "    100" ;break;
-				default : label = null;
+				case 	0: label = "00 - 09";break;					
+				case 	10: label = "    100" ;break;
+				default :label = i * 10 + " - " + (i * 10 + i); 	break;
 				
 			}
 			
