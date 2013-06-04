@@ -18,6 +18,7 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
 		IODialog dialog = getDialog();
 		nPlayers = dialog.readInt("Enter number of players");
 		playerNames = new String[nPlayers];
+		scores = new int[nPlayers][N_CATEGORIES];
 		for (int i = 1; i <= nPlayers; i++) {
 			playerNames[i - 1] = dialog.readLine("Enter name for player " + i);
 		}
@@ -27,12 +28,12 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
 
 	private void playGame() {
 		initCategories();
-		for(int cat = 1;cat <= N_SCORING_CATEGORIES; cat++){
+		for(int turn = 0;turn < N_SCORING_CATEGORIES; turn++){
 			
 			//The initial roll
 			for(int player = 0;player < nPlayers; player++ ){
 				display.printMessage(playerNames[player] +"'s turn!, Click the \"Roll Dice\"button to roll the dice"  );
-				display.waitForPlayerToClickRoll(player + 1);
+				display.waitForPlayerToClickRoll(player + 1);//The player number (between 1 and nPlayers)
 				rollDice();
 				display.displayDice(dice);
 				
@@ -47,141 +48,160 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
 				// In the end of the turn Selecting category
 				display.printMessage("Select a category for this roll");
 				
-				int category = computeScore(player);
-				int score = scores[player][category-1];
-				
-				// pass "player + 1 " instead of "player" cuz the methods take player from 1 to Nplayer 
-				display.updateScorecard(category, player + 1, score); 
-				
-				//	computeTotalScores(player);
-				display.updateScorecard(UPPER_BONUS , player + 1, scores[player][UPPER_BONUS-1]);
-				display.updateScorecard(UPPER_SCORE , player + 1, scores[player][UPPER_SCORE-1]);
-				display.updateScorecard(LOWER_SCORE , player + 1, scores[player][LOWER_SCORE-1]);
-				display.updateScorecard(TOTAL , player + 1, scores[player][TOTAL-1]);
+				int category = getCategory(player);
+				int score = scores[player][category];
+				/*
+
+				Usage: 	display.updateScorecard(category, player, score); 
+				Parameters: 	Updates a value on the Yahtzee scorecard
+					category  	The category number to update (between 1 and 17)
+					player  	The player number (between 1 and nPlayers)
+					score  	The score to display in that box
+				*/
+ 
+				display.updateScorecard(category + 1, player + 1, score); 
+				display.updateScorecard(UPPER_BONUS + 1 , player + 1, scores[player][UPPER_BONUS]);
+				display.updateScorecard(UPPER_SCORE + 1 , player + 1, scores[player][UPPER_SCORE]);
+				display.updateScorecard(LOWER_SCORE + 1 , player + 1, scores[player][LOWER_SCORE]);
+				display.updateScorecard(TOTAL + 1 , player + 1, scores[player][TOTAL]);
 				
 			}
 		}
 			
 		// choosing the winner 
-		int maxTotal = scores[0][TOTAL-1];
+		int maxTotal = scores[0][TOTAL];
 		String winner = playerNames[0];
 		for(int player = 0; player < nPlayers ; player++){
-			if(scores[player][TOTAL-1] > maxTotal){
-				maxTotal = scores[player][TOTAL-1];
+			if(scores[player][TOTAL] > maxTotal){
+				maxTotal = scores[player][TOTAL];
 				winner = playerNames[player];
 			}
 		}
-		display.printMessage("Congratulation, " + winner + ", you're the winner with a total score of " + maxTotal +"!");
+		display.printMessage("Congratulation, " + winner + ", you're the winner with a total score of " + maxTotal + " !");
 		
 	}
+	/*
+	 * getCategory method returns the chosen category with the condition that 
+	 * the category did't taken before that time 
+	 */
 	
-	
-	private int computeScore( int player) {
-			int category = display.waitForPlayerToSelectCategory();
-			while (YahtzeeMagicStub.checkCategory(dice, category) && scores[player][category - 1] != -1){
+	private int getCategory( int player) {
+			int category = display.waitForPlayerToSelectCategory() - 1;
+			while (scores[player][category] != -1){
 				display.printMessage("You alreadt picked that category. Please choose another category");
-				category = display.waitForPlayerToSelectCategory();
+				category = display.waitForPlayerToSelectCategory() - 1;
 			}
 			
-			if(YahtzeeMagicStub.checkCategory(dice, category)){
+			if(YahtzeeMagicStub.checkCategory(dice, category + 1)){
 				scoreForThisCategory(category , player);
 			}else{
-					scores[player][category - 1] = 0;	
-			}		
-			
-			if(scores[player][UPPER_SCORE-1] >= 63)scores[player][UPPER_BONUS-1] = 35 ;
-			scores[player][TOTAL-1] = scores[player][UPPER_SCORE-1] + scores[player][UPPER_BONUS-1] + scores[player][LOWER_SCORE-1];
-			
+					scores[player][category] = 0;	
+			}			
 			return category;
 	}
-	
+	/*
+	 * scoreForThisCategory method is used to update the category array according
+	 * to the selected category and to compute the other fields like Total, lower,
+	 * and upper score 
+	 */
 	private void scoreForThisCategory(int category, int player) {
-		int cat = category - 1; // to store the category x in the index x-1 in the scores array
 		
 		switch(category){
 		case ONES:
 			for(int dc = 0; dc< N_DICE;dc++)
-				if(dice[dc] == 1)scores[player][cat] += dice[dc];
-			scores[player][cat]++ ;			
-			scores[player][UPPER_SCORE-1]+= scores[player][cat];
+				if(dice[dc] == 1)scores[player][category] += dice[dc];
+			scores[player][category]++ ;			
+			scores[player][UPPER_SCORE]+= scores[player][category];
 			break;
 		case TWOS:
 			for(int dc = 0; dc< N_DICE;dc++)
-				if(dice[dc] == 2)scores[player][cat] += dice[dc];
-			scores[player][cat]++ ;
-			scores[player][UPPER_SCORE-1]+= scores[player][cat];
+				if(dice[dc] == 2)scores[player][category] += dice[dc];
+			scores[player][category]++ ;
+			scores[player][UPPER_SCORE]+= scores[player][category];
 			break;
 		case THREES:
 			for(int dc = 0; dc< N_DICE;dc++)
-				if(dice[dc] == 3)scores[player][cat] += dice[dc];
-			scores[player][cat]++ ;
-			scores[player][UPPER_SCORE-1]+= scores[player][cat];
+				if(dice[dc] == 3)scores[player][category] += dice[dc];
+			scores[player][category]++ ;
+			scores[player][UPPER_SCORE]+= scores[player][category];
 			break;
 		case FOURS:
 			for(int dc = 0; dc< N_DICE;dc++)
-				if(dice[dc] == 4)scores[player][cat] += dice[dc];
-			scores[player][cat]++ ;
-			scores[player][UPPER_SCORE-1]+= scores[player][cat];
+				if(dice[dc] == 4)scores[player][category] += dice[dc];
+			scores[player][category]++ ;
+			scores[player][UPPER_SCORE]+= scores[player][category];
 			break;
 		case FIVES:
 			for(int dc = 0; dc< N_DICE;dc++)
-				if(dice[dc] == 5)scores[player][cat] += dice[dc];
-			scores[player][cat]++ ;
-			scores[player][UPPER_SCORE-1]+= scores[player][cat];
+				if(dice[dc] == 5)scores[player][category] += dice[dc];
+			scores[player][category]++ ;
+			scores[player][UPPER_SCORE]+= scores[player][category];
 			break;
 		case SIXES:
 			for(int dc = 0; dc< N_DICE;dc++)
-				if(dice[dc] == 6)scores[player][cat] += dice[dc];
-			scores[player][cat]++ ;
-			scores[player][UPPER_SCORE-1]+= scores[player][cat];
+				if(dice[dc] == 6)scores[player][category] += dice[dc];
+			scores[player][category]++ ;
+			scores[player][UPPER_SCORE]+= scores[player][category];
 			break;
 		case THREE_OF_A_KIND:case FOUR_OF_A_KIND:case CHANCE:
 			for(int dc = 0; dc< N_DICE;dc++)
-				scores[player][cat] += dice[dc];
-			scores[player][cat]++ ;
-			scores[player][LOWER_SCORE-1]+= scores[player][cat];
+				scores[player][category] += dice[dc];
+			scores[player][category]++ ;
+			scores[player][LOWER_SCORE]+= scores[player][category];
 			break;			
 		case FULL_HOUSE:
-			scores[player][cat]=25;
-			scores[player][LOWER_SCORE-1]+= scores[player][cat];
+			scores[player][category]=25;
+			scores[player][LOWER_SCORE]+= scores[player][category];
 			break;
 		case SMALL_STRAIGHT:
-			scores[player][cat]=30;
-			scores[player][LOWER_SCORE-1]+= scores[player][cat];
+			scores[player][category]=30;
+			scores[player][LOWER_SCORE]+= scores[player][category];
 			break;
 		case LARGE_STRAIGHT:
-			scores[player][cat]=40;
-			scores[player][LOWER_SCORE-1]+= scores[player][cat];
+			scores[player][category]=40;
+			scores[player][LOWER_SCORE]+= scores[player][category];
 			break;
 		case YAHTZEE:
-			scores[player][cat]=50;
-			scores[player][LOWER_SCORE-1]+= scores[player][cat];
+			scores[player][category]=50;
+			scores[player][LOWER_SCORE]+= scores[player][category];
 			break;						
 		}
+		if(scores[player][UPPER_SCORE] >= 63) scores[player][UPPER_BONUS] = 35 ;
+		scores[player][TOTAL] = scores[player][UPPER_SCORE] + scores[player][UPPER_BONUS] + scores[player][LOWER_SCORE];
 		
 	}
-
+	/*
+	 * re-roll dice method update the selected dices in the dice array 
+	 */
 	private void reRollDice() {
 			for(int dc = 0; dc< N_DICE;dc++){
 				if(display.isDieSelected(dc))
 					dice[dc] = rgen.nextInt(1, 6);
 			}			
 		}
-	
+	/*
+	 * roll Dice method updates the dice array
+	 */
 	private void rollDice() {
 			for(int dc = 0; dc< N_DICE;dc++){
 				dice[dc] = rgen.nextInt(1, 6);
 			}			
 		}
+	/*
+	 * initialization of the Categories array with scores of -1
+	 * to enable us to know if the category used before or not
+	 * if the category didn't use yet, its value'd be -1
+	 */
+	
 	private void initCategories(){
 		for(int i = 0; i < scores.length; i++){
 			for(int j = 0; j < scores[0].length; j++){
 				scores[i][j] = -1;
 			}
-			scores[i][UPPER_SCORE-1]=0;
-			scores[i][LOWER_SCORE-1]=0;
-			scores[i][UPPER_BONUS-1]=0;
-			scores[i][TOTAL-1]=0;
+			scores[i][UPPER_SCORE]=0;
+			scores[i][LOWER_SCORE]=0;
+			scores[i][UPPER_BONUS]=0;
+			scores[i][TOTAL]=0;
 		}
 	}
 
@@ -190,8 +210,7 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
 	private String[] playerNames;
 	private YahtzeeDisplay display;
 	private RandomGenerator rgen = new RandomGenerator();
-	
 	private int[] dice = new int[N_DICE];
-	private int[][] scores = new int[MAX_PLAYERS][N_CATEGORIES];
+	private int[][] scores ;
 
 }
