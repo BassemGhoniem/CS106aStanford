@@ -7,8 +7,10 @@
 import acm.io.*;
 import acm.program.*;
 import acm.util.*;
+import java.util.*;
 
 public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
+	
 	
 	public static void main(String[] args) {
 		new Yahtzee().start(args);
@@ -17,6 +19,9 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
 	public void run() {
 		IODialog dialog = getDialog();
 		nPlayers = dialog.readInt("Enter number of players");
+		while(nPlayers > MAX_PLAYERS){
+			nPlayers = dialog.readInt("Enter number of players, The Max players is Four");			
+		}
 		playerNames = new String[nPlayers];
 		scores = new int[nPlayers][N_CATEGORIES];
 		for (int i = 1; i <= nPlayers; i++) {
@@ -44,6 +49,8 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
 					reRollDice();
 					display.displayDice(dice);
 				}
+				
+				
 				
 				// In the end of the turn Selecting category
 				display.printMessage("Select a category for this roll");
@@ -92,12 +99,78 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
 				category = display.waitForPlayerToSelectCategory() - 1;
 			}
 			
-			if(YahtzeeMagicStub.checkCategory(dice, category + 1)){
+			if(checkCategory(dice, category)){
 				scoreForThisCategory(category , player);
 			}else{
 					scores[player][category] = 0;	
 			}			
 			return category;
+	}
+	
+	/*
+	 * CheckCategory method takes the dice array and the category and return 
+	 * a boolean value indicating whether the dice configuration is suitable 
+	 * for that category or not 
+	 */
+	
+	
+	
+	private boolean checkCategory(int[] dice, int category){
+		int num = 0;
+		int flag =0;
+		Arrays.sort(dice);//sorting the dice array before any computations 
+		
+		switch(category){
+		case YAHTZEE : 
+			for(int dc = 0;dc < N_DICE;dc++){
+				if(dice[dc] != dice[0])return false;
+			}
+			return true;
+			
+		case FOUR_OF_A_KIND:			
+			for(int dc = 0;dc < N_DICE; dc++){
+				num = dice[dc];
+				flag = 0;
+				for(int i = 0; i < N_DICE;i++){
+					if(dice[i]==num)flag++;
+				}
+				if(flag >= 4)return true;
+			}
+			return false;
+			
+		case THREE_OF_A_KIND:			
+			for(int dc = 0;dc < N_DICE; dc++){
+				num = dice[dc];
+				flag = 0;
+				for(int i = 0; i < N_DICE;i++){
+					if(dice[i]==num)flag++;
+				}
+				if(flag >= 3)return true;
+			}
+			return false;
+			
+		case FULL_HOUSE :			
+			boolean p = (dice[0]==dice[1]) & (dice[N_DICE-2]==dice[N_DICE-1])
+				& ((dice[2]==dice[1]) | (dice[2]==dice[N_DICE-1]));			
+			if(p)return true;
+			else return false;
+			
+		case LARGE_STRAIGHT :
+			for(int dc = 0; dc <N_DICE-1; dc++){
+				if(dice[dc+1] - dice[dc] != 1)return false;
+			}
+			return true;
+			
+		case SMALL_STRAIGHT:
+			flag = 0;
+			for(int dc = 0; dc <N_DICE-1; dc++){
+				if(dice[dc+1] - dice[dc] != 1)flag++;
+			}
+			if(flag == 1)return true;
+			else return false;
+		}
+				
+		return true;
 	}
 	/*
 	 * scoreForThisCategory method is used to update the category array according
