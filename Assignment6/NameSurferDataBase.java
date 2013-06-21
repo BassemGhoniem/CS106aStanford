@@ -48,7 +48,7 @@ public class NameSurferDataBase implements NameSurferConstants {
 	 */
 	public NameSurferEntry findEntry(String name) {
 		String entry = getEntryIgnoreCase(name);
-		if(entry==null)return null;
+		if(entry==null)return new NameSurferEntry(name + nonExistEntry);
 		return surferDataBase.get(entry);
 	}
 

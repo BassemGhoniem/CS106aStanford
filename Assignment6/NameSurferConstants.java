@@ -31,5 +31,8 @@ public interface NameSurferConstants {
 
 	/** The maximum length of the name **/
 	public static final int MAX_NAME_LENGTH = 20;
+	
+	/** nonExist entry **/
+	public static final String nonExistEntry =" 0 0 0 0 0 0 0 0 0 0 0";
 
 }
