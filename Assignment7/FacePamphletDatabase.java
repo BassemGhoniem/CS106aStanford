@@ -16,7 +16,7 @@ public class FacePamphletDatabase implements FacePamphletConstants {
 	 * the database.
 	 */
 	public FacePamphletDatabase() {
-		// You fill this in
+		profiles = new HashMap<String, FacePamphletProfile>();
 	}
 	
 	
@@ -27,7 +27,7 @@ public class FacePamphletDatabase implements FacePamphletConstants {
 	 * the new profile passed in.
 	 */
 	public void addProfile(FacePamphletProfile profile) {
-		// You fill this in
+		profiles.put(profile.getName(), profile);
 	}
 
 	
@@ -37,8 +37,8 @@ public class FacePamphletDatabase implements FacePamphletConstants {
 	 * the given name, the method returns null.
 	 */
 	public FacePamphletProfile getProfile(String name) {
-		// You fill this in.  Currently always returns null.
-		return null;
+		if(profiles.containsKey(name))return profiles.get(name);
+		else return null;
 	}
 	
 	
@@ -52,7 +52,16 @@ public class FacePamphletDatabase implements FacePamphletConstants {
 	 * the database is unchanged after calling this method.
 	 */
 	public void deleteProfile(String name) {
-		// You fill this in
+		if(profiles.containsKey(name)){
+			profiles.remove(name);
+			for(String profile: profiles.keySet()){
+				Iterator<String> it = profiles.get(profile).getFriends();
+				while(it.hasNext()){
+					if(it.next().equals(name))
+						profiles.get(profile).removeFriend(name);
+				}
+			}
+		}
 	}
 
 	
@@ -61,8 +70,9 @@ public class FacePamphletDatabase implements FacePamphletConstants {
 	 * that has the given name.  It returns false otherwise.
 	 */
 	public boolean containsProfile(String name) {
-		// You fill this in.  Currently always returns false.
-		return false;
+		if(profiles.containsKey(name))return true;
+		else return false;
 	}
+	private HashMap<String, FacePamphletProfile> profiles;
 
 }

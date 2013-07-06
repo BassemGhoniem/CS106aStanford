@@ -19,7 +19,7 @@ public class FacePamphlet extends ConsoleProgram
 	private JTextField status;
 	private JTextField picture;
 	private JTextField friend;
-	
+	private FacePamphletDatabase people = new FacePamphletDatabase(); ;
 	
 	/**
 	 * This method has the responsibility for initializing the 
@@ -37,7 +37,10 @@ public class FacePamphlet extends ConsoleProgram
 		name = new JTextField(TEXT_FIELD_SIZE);
 		
 		add(new JLabel("Name"), NORTH);
+		name.addActionListener(this);
+		name.setActionCommand("Add");
 		add(name, NORTH);
+		
 		add(new JButton("Add"), NORTH);
 		add(new JButton("Delete"), NORTH);
 		add(new JButton("Lookup"), NORTH);
@@ -74,14 +77,40 @@ public class FacePamphlet extends ConsoleProgram
      * to respond to these actions.
      */
     public void actionPerformed(ActionEvent e) {
+		String profileName = name.getText();
 		if(e.getActionCommand().equals("Add")){
-			println("Add: " +name.getText());
+			
+			
+			if(!people.containsProfile(profileName)){
+				FacePamphletProfile profile = new FacePamphletProfile(profileName);
+				people.addProfile(profile);
+				println("Add: new profile: " + profile.toString());
+			}else{
+				println("Add: profile for " + profileName +" Already exists "
+						+ people.getProfile(profileName).toString());	
+			}
+			
+			
 		}else if(e.getActionCommand().equals("Delete")){
-			println("Delete: " +name.getText());
+			
+			if(!people.containsProfile(profileName)){
+				println("Delete: profile with name " + profileName + " does not exist");
+			}else{
+				people.deleteProfile(profileName);
+				println("Delete: profile of " + profileName +" deleted" );
+			}
+			
 		}else if(e.getActionCommand().equals("Lookup")){
-			println("Lookup: " +name.getText());
+			
+			if(!people.containsProfile(profileName)){
+				println("Lookup: profile with name " + profileName + " does not exist");
+			}else{
+				println("Lookup: " + people.getProfile(profileName).toString() );
+			}
+			
+			
 		}if(e.getActionCommand().equals("Change Status")){
-			println("Change Status: " +status.getText());
+			println("Change Status: " );
 		}if(e.getActionCommand().equals("Change Picture")){
 			println("Change Picture: " +picture.getText());
 		}if(e.getActionCommand().equals("Add Friend")){

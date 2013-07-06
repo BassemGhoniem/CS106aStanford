@@ -109,11 +109,12 @@ public class FacePamphletProfile implements FacePamphletConstants {
 	 * would return the string: "Alice (coding): Don, Chelsea, Bob"
 	 */ 
 	public String toString() {
-		String profile = profileName + " (" + status +"): ";
+		String profile = profileName + " (" + status + "): ";
 		for(String friend: friends){
 			profile += friend + ", ";
 		}
-		return profile.substring(0, profile.length()-3);
+		char lastChar =profile.charAt(profile.length()-2);
+		return profile.substring(0, (lastChar == ',' ? profile.length()-3 : profile.length()-2));
 	}
 	/*
 	 * Instance Variables of the FacePamphletProfile object
