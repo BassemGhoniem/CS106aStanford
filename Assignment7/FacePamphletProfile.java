@@ -93,8 +93,8 @@ public class FacePamphletProfile implements FacePamphletConstants {
 	 * This method returns an iterator over the list of friends 
 	 * associated with the profile.
 	 */ 
-	public Iterator<String> getFriends() {
-		return friends.iterator();
+	public ArrayList<String> getFriends() {
+		return friends;
 	}
 	
 	/** 
@@ -109,12 +109,12 @@ public class FacePamphletProfile implements FacePamphletConstants {
 	 * would return the string: "Alice (coding): Don, Chelsea, Bob"
 	 */ 
 	public String toString() {
-		String profile = profileName + " (" + status + "): ";
+		String profile = profileName + " (" + status + "):";
 		for(String friend: friends){
-			profile += friend + ", ";
+			profile += " " + friend + ",";
 		}
-		char lastChar =profile.charAt(profile.length()-2);
-		return profile.substring(0, (lastChar == ',' ? profile.length()-3 : profile.length()-2));
+		char lastChar =profile.charAt(profile.length()-1);
+		return profile.substring(0, (lastChar == ',' ? profile.length()-1 : profile.length()));
 	}
 	/*
 	 * Instance Variables of the FacePamphletProfile object

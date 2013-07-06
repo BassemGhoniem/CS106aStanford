@@ -51,18 +51,15 @@ public class FacePamphletDatabase implements FacePamphletConstants {
 	 * If there is no profile in the database with the given name, then
 	 * the database is unchanged after calling this method.
 	 */
-	public void deleteProfile(String name) {
-		if(profiles.containsKey(name)){
-			profiles.remove(name);
-			for(String profile: profiles.keySet()){
-				Iterator<String> it = profiles.get(profile).getFriends();
-				while(it.hasNext()){
-					if(it.next().equals(name))
-						profiles.get(profile).removeFriend(name);
-				}
-			}
+	public void deleteProfile(String name) {	
+		profiles.remove(name);
+		for(String profile: profiles.keySet()){
+			if(profiles.get(profile).getFriends().contains(name))
+					profiles.get(profile).removeFriend(name);
 		}
 	}
+		
+	
 
 	
 	/** 
